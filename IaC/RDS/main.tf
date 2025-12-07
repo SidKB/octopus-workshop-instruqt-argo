@@ -1,6 +1,7 @@
 ###############################################
 # FULLY AUTOMATED, RERUNNABLE RDS SQL Server
-# Password output is NOT sensitive (Option 3)
+# Password is EXPOSED intentionally using
+# nonsensitive() -> safe for your throwaway lab
 ###############################################
 
 terraform {
@@ -55,7 +56,7 @@ resource "aws_vpc" "main" {
 }
 
 ###############################################
-# PUBLIC SUBNETS IN 2 AZs
+# PUBLIC SUBNETS (IN 2 AZs)
 ###############################################
 
 resource "aws_subnet" "subnet_a" {
@@ -81,7 +82,7 @@ resource "aws_subnet" "subnet_b" {
 }
 
 ###############################################
-# INTERNET GATEWAY + ROUTING
+# INTERNET GATEWAY + ROUTES
 ###############################################
 
 resource "aws_internet_gateway" "gw" {
@@ -105,18 +106,18 @@ resource "aws_route_table" "rt" {
   }
 }
 
-resource "aws_route_table_association" "a" {
+resource "aws_route_table_association" "rt_a" {
   subnet_id      = aws_subnet.subnet_a.id
   route_table_id = aws_route_table.rt.id
 }
 
-resource "aws_route_table_association" "b" {
+resource "aws_route_table_association" "rt_b" {
   subnet_id      = aws_subnet.subnet_b.id
   route_table_id = aws_route_table.rt.id
 }
 
 ###############################################
-# SECURITY GROUP — ALLOW SQL SERVER
+# SECURITY GROUP – ALLOW SQL SERVER (1433)
 ###############################################
 
 resource "aws_security_group" "sql_sg" {
@@ -128,7 +129,7 @@ resource "aws_security_group" "sql_sg" {
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # fully open for disposable environment
+    cidr_blocks = ["0.0.0.0/0"]  # Fully open for lab
   }
 
   egress {
@@ -144,7 +145,7 @@ resource "aws_security_group" "sql_sg" {
 }
 
 ###############################################
-# RDS SUBNET GROUP - RANDOM NAME
+# RDS SUBNET GROUP (RANDOMIZED NAME)
 ###############################################
 
 resource "aws_db_subnet_group" "sql_subnets" {
@@ -184,7 +185,7 @@ resource "aws_db_instance" "sqlserver" {
 }
 
 ###############################################
-# OUTPUTS (PASSWORD IS NOT SENSITIVE)
+# NON-SENSITIVE OUTPUTS ⚠️ PASSWORD EXPOSED
 ###############################################
 
 output "rds_host" {
@@ -199,9 +200,10 @@ output "username" {
   value = random_string.username.result
 }
 
+# THE FIX — nonsensitive() allows Terraform to output the password
 output "password" {
-  value     = random_password.password.result
-  sensitive = false   # <-- YOU CAN SEE THE PASSWORD IN OCTOPUS NOW
+  value     = nonsensitive(random_password.password.result)
+  sensitive = false
 }
 
 output "instance_identifier" {
