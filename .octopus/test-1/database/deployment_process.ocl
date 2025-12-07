@@ -1,0 +1,22 @@
+step "sql-create-database-user-if-not-exists" {
+    name = "SQL - Create Database User If Not Exists"
+
+    action {
+        properties = {
+            createDatabaseName = "#{SQLServer.Database.Name}"
+            createSqlLogin = "#{SQLServer.Database.UserName}"
+            createSqlLoginPasswordWhoHasRights = "#{SQLServer.Database.Password}"
+            createSqlLoginUserWhoHasCreateUserRights = "#{SQLServer.Database.UserName}"
+            createSqlServer = "#{SQLServer.Database.Host}"
+            Octopus.Action.Template.Id = "ActionTemplates-1"
+            Octopus.Action.Template.Version = "2"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool = "hosted-ubuntu"
+
+        container {
+            feed = "github-container-registry"
+            image = "octopusdeploy/worker-tools:6.5.0-ubuntu.22.04"
+        }
+    }
+}
