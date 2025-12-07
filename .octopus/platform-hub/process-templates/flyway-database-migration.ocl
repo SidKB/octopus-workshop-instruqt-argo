@@ -57,6 +57,16 @@ parameter "parameter.container.feed" {
     label = "Container Feed"
 }
 
+parameter "parameter.package.path" {
+    display_settings = {
+        Octopus.ControlType = "SingleLineText"
+    }
+    help_text = ""
+    label = "Package Path Name"
+
+    value "filesystem:#{Octopus.Action.Package[Flyway.Package.Value].ExtractedPath}/src/database" {}
+}
+
 step "sql-create-database-if-not-exists" {
     name = "SQL - Create Database If Not Exists"
 
@@ -297,7 +307,7 @@ step "flyway-database-migrations" {
             Flyway.Authentication.Method = "usernamepassword"
             Flyway.Command.BaseLineOnMigrate = "false"
             Flyway.Command.FailOnDrift = "true"
-            Flyway.Command.Locations = "filesystem:#{Octopus.Action.Package[Flyway.Package.Value].ExtractedPath}/src/database"
+            Flyway.Command.Locations = "#{parameter.package.path}"
             Flyway.Command.OutOfOrder = "false"
             Flyway.Command.SkipExecutingMigrations = "false"
             Flyway.Command.Target = "latest"
