@@ -67,6 +67,14 @@ parameter "parameter.package.path" {
     value "filesystem:#{Octopus.Action.Package[Flyway.Package.Value].ExtractedPath}/src/database" {}
 }
 
+parameter "paramater.review.environemnt" {
+    display_settings = {
+        Octopus.ControlType = "Environments"
+    }
+    help_text = "The Environment you want to run a review in "
+    label = "Review Environment"
+}
+
 step "sql-create-database-if-not-exists" {
     name = "SQL - Create Database If Not Exists"
 
@@ -303,6 +311,7 @@ step "flyway-database-migrations-dryrun" {
 
     action {
         action_type = "Octopus.Script"
+        environments_variable = "#{paramater.review.environemnt}"
         properties = {
             Flyway.Authentication.Method = "usernamepassword"
             Flyway.Command.BaseLineOnMigrate = "false"
