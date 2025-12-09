@@ -35,4 +35,8 @@ process_template "run-a-process-template" {
     parameter "paramater.review.environement" {
         value = "Environments-83"
     }
+
+    parameter "paramater.flyway.pat" {
+        value = "#{Flyway.PAT}"
+    }
 }
