@@ -1,0 +1,29 @@
+step "update-argo-cd-application-image-tags" {
+    name = "Update Argo CD Application Image Tags"
+
+    action {
+        action_type = "Octopus.ArgoCDUpdateImageTags"
+        properties = {
+            Octopus.Action.ArgoCD.CommitMessageSummary = "Octopus Deploy updated image versions"
+            Octopus.Action.ArgoCD.CommitMethod = "DirectCommit"
+            OctopusUseBundledTooling = "False"
+        }
+        worker_pool = "hosted-ubuntu"
+
+        container {
+            feed = "github-container-registry"
+            image = "octopusdeploylabs/argocd-workertools"
+        }
+
+        packages "octopus-workshop-instruqt-argo_sample.frontend" {
+            acquisition_location = "NotAcquired"
+            feed = "github-container-registry"
+            package_id = "sidkb/octopus-workshop-instruqt-argo/sample.frontend"
+            properties = {
+                Extract = "False"
+                Purpose = "DockerImageReference"
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
